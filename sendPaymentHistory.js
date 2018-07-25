@@ -78,6 +78,7 @@ function sendPaymentHistory() {
     Logger.log(arrayMatch);
 
     var groupName = configHash["グループ名"];
+    var message = '';
     
     // 検索結果によって異なる処理
     if (arrayMatch.length === 0) { // 検索結果が0件
