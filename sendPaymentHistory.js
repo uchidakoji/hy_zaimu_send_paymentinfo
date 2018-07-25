@@ -85,7 +85,7 @@ function sendPaymentHistory() {
         var matchResult = "notFound";
         Logger.log("matchResult: " + matchResult);
         
-        var message = "大変申し訳ありませんが、" + nameInputOrg +　" 様の回生とお名前をデータベースから検索することができませんでした。" + groupName + "事務局で確認を行い、入力されたこちらのメールアドレスに連絡いたします。"
+        message = "大変申し訳ありませんが、" + nameInputOrg +　" 様の回生とお名前をデータベースから検索することができませんでした。" + groupName + "事務局で確認を行い、入力されたこちらのメールアドレスに連絡いたします。"
         + "<br>念のため入力された回生、高校卒業時のルーム、氏名、氏名よみに間違いがなかったかをご確認ください。";
         
     }
@@ -94,7 +94,7 @@ function sendPaymentHistory() {
         var matchResult = "duplicated";
         Logger.log("matchResult: " + matchResult);
         
-        var message = nameInputOrg +　" 様の回生とお名前に一致する検索結果が" + arrayMatch.length + "件あります。どちらが" + nameInputOrg + " 様の会員情報かこちらのメールに返信する形で教えていただけますでしょうか？。<br>"
+        message = nameInputOrg +　" 様の回生とお名前に一致する検索結果が" + arrayMatch.length + "件あります。どちらが" + nameInputOrg + " 様の会員情報かこちらのメールに返信する形で教えていただけますでしょうか？。<br>"
         + groupName + "事務局で確認を行い、改めて連絡させていただきます。";
         
         // 検索結果を表示
@@ -171,7 +171,7 @@ function sendPaymentHistory() {
         Logger.log(table);
         
         // ここより　各種条件によって、会員への異なるメッセージを作成.定義したcompose_message関数を使用する。戻り値はString
-        var message = compose_message(paymentMethod, thisYearPayrec, oneYearAgoPayrec, countNopay, configHash);
+        message = compose_message(paymentMethod, thisYearPayrec, oneYearAgoPayrec, countNopay, configHash);
         Logger.log(message);
     }
 
@@ -287,9 +287,10 @@ function compose_message(paymentMethod, thisYearPayrec, oneYearAgoPayrec, countN
 // $変数　は　繰り返しとなるので、後で実際のテキストに置換
 var inputFormURL = configHash["入力フォームURL"];
 var groupName = configHash["グループ名"];
+var message = '';
 
 if (paymentMethod.indexOf("年会費納入状況") >= 0){ //過去3年間の支払い状況のみを確認する場合 
-var message = "$nameInputOrg様の直近3年間の年会費納入状況は以下の通りです。"
+    message = "$nameInputOrg様の直近3年間の年会費納入状況は以下の通りです。"
     if (thisYearPayrec.indexOf("未納入") >= 0){   
         message = message + "今年度分($thisFiscalYear)の年会費納入状況は<b><u>未納入</u></b>となっております。"
         + "<br><br>年会費の支払い方法についての詳細が知りたい場合は、再度<A href=\"" + inputFormURL + "\">こちらのリンク</A>より必要な情報の入力をお願いいたします。"   
@@ -299,45 +300,45 @@ var message = "$nameInputOrg様の直近3年間の年会費納入状況は以下
     }
 }
 else if (thisYearPayrec == "納入済：銀行口座からの自動引き落とし"){ //銀行口座引き落としですでに今年度分年会費を支払い済みのケース
- 
-    var message = "$nameInputOrg様からは「銀行口座からの自動引き落とし」にてすでに今年度分($thisFiscalYear)の年会費を頂いております。大変ありがとうございました。"
+    message = "$nameInputOrg様からは「銀行口座からの自動引き落とし」にてすでに今年度分($thisFiscalYear)の年会費を頂いております。大変ありがとうございました。"
     if(paymentMethod.indexOf("変更") >= 0){ // 引き落とし口座の変更希望の会員に対するコメント     
         message = message + "<br><br>自動引き落とし口座の変更を希望されていますので、$withdrawalInfo";     
     }
- 
 }
 else if (thisYearPayrec == "納入済：" + groupName + "への振込"){ //邦友会口座への振込ですでに今年度分年会費を支払い済みのケース
-    var message = "$nameInputOrg様からはすでに今年度分($thisFiscalYear)の年会費を頂いております。大変ありがとうございました。"
-    
+    message = "$nameInputOrg様からはすでに今年度分($thisFiscalYear)の年会費を頂いております。大変ありがとうございました。"
     if(paymentMethod.indexOf("自動引き落とし") >= 0){ // 今年度分納入　かつ　自動引き落とし希望の会員に対するコメント    
         message = message + "<br><br>$withdrawalInfo";       
     }
-  
 }
 else if (thisYearPayrec.indexOf("未納入") >= 0){ //今年度分年会費が未納入のケース
     var thisMonth = Number(Utilities.formatDate(new Date(), 'JST', 'MM')); // 月を取得
     Logger.log("thisMonth: " + thisMonth);
     //thisMonth = 5;
- 
-    /* ここに　前年度未納入で 引き落とし口座変更の希望を出している人のメッセージを送るプログラムをかく　*/
 
     if ( (oneYearAgoPayrec == "納入済：銀行口座からの自動引き落とし")　&& ( (thisMonth >= 4) && (thisMonth <= 6) ) ){　//　第一四半期はまだ自動引き落としの結果がDBに反映されていないことを考慮
-        var message = "$nameInputOrg様は「銀行口座からの自動引き落とし」を利用して、" + groupName + "年会費の振込みをして頂いております。"
-        + "<br>今年度分の支払い状況は未納入となっておりますが、これは毎年4月27日に行われている振込の結果がまだデータベースに反映されていない可能性がございます。"
-        + "<br>お手数ではございますが、7月頃にまた改めて年会費支払いに関しての問い合わせをしていただけますでしょうか。よろしくお願いいたします。";   
+        message = "$nameInputOrg様は「銀行口座からの自動引き落とし」を利用して、" + groupName + "年会費の振込みをして頂いております。"
+        
+        if(paymentMethod === "自動引き落とし口座の変更"){ //自動引き落とし口座の変更を希望の場合、
+            message = message + "<br><br>自動引き落とし口座の変更を希望されていますので、$withdrawalInfo";  
+        }
+        else{
+            message = message + "<br>今年度分の支払い状況は未納入となっておりますが、これは毎年4月27日に行われている振込の結果がまだデータベースに反映されていない可能性がございます。"
+            message = message + "<br>お手数ではございますが、7月頃にまた改めて年会費支払いに関しての問い合わせをしていただけますでしょうか。よろしくお願いいたします。";
+        }
     }
-    else {
-        var message = "$nameInputOrg様の今年度分($thisFiscalYear)の年会費納入状況は<b><u>未納入</u></b>となっております。"
+    else { // ここより未納入者への情報を作成
+        message = "$nameInputOrg様の今年度分($thisFiscalYear)の年会費納入状況は<b><u>未納入</u></b>となっております。"
         var nopayAmount = 2000 * countNopay;
         Logger.log("nopayAmount: " + nopayAmount);
     
         if(countNopay > 1){
             var ruleURL = configHash["会則URL"];
-            var message = message + "<br>また、今年度を含めた過去3年間で<b><u>" + countNopay + "年分未納入</u></b>となっております。"
-            var message = message + "<br><br><A href=\"" + ruleURL + "\">" + groupName + " 会計規約第6条</A>により「過去の年会費未納分については最大3年に亘り遡り請求することが出来る。」となっており、過去の未納分を含めた<b><u>" + nopayAmount + "円</u></b>をお支払いいただけると大変助かります。";       
+            message = message + "<br>また、今年度を含めた過去3年間で<b><u>" + countNopay + "年分未納入</u></b>となっております。"
+            message = message + "<br><br><A href=\"" + ruleURL + "\">" + groupName + " 会計規約第6条</A>により「過去の年会費未納分については最大3年に亘り遡り請求することが出来る。」となっており、過去の未納分を含めた<b><u>" + nopayAmount + "円</u></b>をお支払いいただけると大変助かります。";       
         }
         else if (countNopay == 1){
-            var message = message + "<br>今年度分の年会費<b>" + nopayAmount + "円</b>をお支払いいただけると助かります。"       
+            message = message + "<br>今年度分の年会費<b>" + nopayAmount + "円</b>をお支払いいただけると助かります。"       
         }
         
         //// ここより支払い方法の説明
